@@ -1,0 +1,12 @@
+{
+  "pull_request": {
+    "head": {
+      "ref": "java_test",
+      "sha": "8e307072ee4b2044c97bb7df4198c130a88e2fe4"
+    },
+    "base": {
+      "ref": "development",
+      "sha": "a9ee8ae2dcafa3ec41dccde39d5507de85d6cbd6"
+    }
+  }
+}

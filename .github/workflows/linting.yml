@@ -1,0 +1,51 @@
+name: Pull Request checks
+
+on:
+  workflow_call:
+
+jobs:
+  checkstyle:
+    runs-on: ubuntu-latest
+    name: checkstyle
+    steps:
+      - name: Checkout the commit
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changedFiles
+        uses: tj-actions/changed-files@v31
+        with:
+          sha: ${{ github.event.pull_request.head.sha }}
+          base_sha: ${{ github.event.pull_request.base.sha }}
+
+      - name: Setting up java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # Needed to have access to the linter files
+      - name: Checkout this repository
+        uses: actions/checkout@v3
+        with:
+          repository: pmagentur/linting-java
+          path: linting-java
+
+      - name: Linting with checkstyle
+        id: linter
+        uses: pmagentur/linting-action@v0.2
+        with:
+          changed-files: ${{ steps.changedFiles.outputs.all_changed_files }}
+          linter-command: "java -jar linting-java/checkstyle/checkstyle-10.3.3-all.jar -c linting-java/checkstyle/config.xml {files}"
+          parse-pattern: '\[(?<level>[^\]]+)\] (?<file>[^:]+):(?<line>\d+)(?::(?<column>\d+))?: (?<message>.+) \[(?<ruleName>[^\]]+)\]'
+          relevant-file-endings: '["java"]'
+
+      - name: Add Annotations
+        uses: pmagentur/linting-annotations@v0.1
+        if: failure() && steps.linter.outputs.annotations != ''
+        with:
+          commitSha: ${{ github.event.pull_request.head.sha }}
+          checkName: 'Java Linting'
+          annotations: ${{ steps.linter.outputs.annotations }}
