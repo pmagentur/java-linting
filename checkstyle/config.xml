@@ -45,8 +45,21 @@
         <property name="max" value="100"/>
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     </module>
-
+    <module name="SuppressWarningsFilter"/>
     <module name="TreeWalker">
+        <module name="SuppressWarningsHolder"/>
+        <module name="SuppressWarnings">
+            <property name="format" value="\w*"/>
+            <message key="suppressed.warning.not.allowed"
+                     value="The warning ''{0}'' cannot be suppressed without a comment explaining the reason for suppression. Pleas provide a comment that starts with 'SuppressWarnings: ' and has at least 10 more characters that explain the case." />
+            <property name="tokens" value="CLASS_DEF,INTERFACE_DEF,ENUM_DEF,ANNOTATION_DEF,ANNOTATION_FIELD_DEF,ENUM_CONSTANT_DEF,METHOD_DEF,CTOR_DEF"/>
+        </module>
+        <module name="SuppressWithNearbyCommentFilter">
+            <property name="commentFormat"
+                      value="SuppressWarnings: .{10,}"/>
+            <property name="checkFormat" value="SuppressWarnings"/>
+            <property name="influenceFormat" value="3"/>
+        </module>
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
             <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
