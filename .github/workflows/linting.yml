@@ -9,6 +9,11 @@ on:
         required: false
         type: string
         default: '._linting' # Use the configs from this repository (separate checkout)
+      excluded-directories:
+        description: 'List of directories to exclude (JSON), empty = none'
+        required: false
+        type: string
+        default: '[]'
 
 jobs:
   checkstyle:
@@ -42,12 +47,13 @@ jobs:
 
       - name: Linting with checkstyle
         id: linter
-        uses: pmagentur/linting-action@v0.2
+        uses: pmagentur/linting-action@v0.4
         with:
           changed-files: ${{ steps.changedFiles.outputs.all_changed_files }}
           linter-command: "java -jar ._linting/checkstyle/checkstyle-10.3.3-all.jar -c ${{ inputs.configs-path }}/checkstyle/config.xml {files}"
           parse-pattern: '\[(?<level>[^\]]+)\] (?<file>[^:]+):(?<line>\d+)(?::(?<column>\d+))?: (?<message>.+) \[(?<ruleName>[^\]]+)\]'
           relevant-file-endings: '["java"]'
+          excluded-directories: ${{ inputs.excluded-directories }}
 
       - name: Add Annotations
         uses: pmagentur/linting-annotations@v0.1
